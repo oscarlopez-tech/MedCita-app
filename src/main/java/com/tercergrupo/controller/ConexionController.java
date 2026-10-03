@@ -12,6 +12,7 @@ public class ConexionController {
         Connection conexion = null;
 
         try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
             conexion = DriverManager.getConnection(URL, USER, PASSWORD);
             if (conexion != null && !conexion.isClosed()){
                 System.out.println("Conexion exitosa a la base de datos de Railway");
