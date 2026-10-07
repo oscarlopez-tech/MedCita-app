@@ -34,7 +34,7 @@ public class UserRegistration {
 
     }
     public boolean actualizarUsuario(User usuarioActualizado){
-        String sql = "UPDATE usuarios SET nombre = ?, apellido = ?, telefono = ?, correo_electronico = ?, contrasena = ? WHERE usuario = ?, pregunta_Seguridad = ?";
+        String sql = "UPDATE usuarios SET nombre = ?, apellido = ?, telefono = ?, correo_electronico = ?, contraseña = ? WHERE usuario = ? AND pregunta_Seguridad = ?";
 
         try (Connection conexion = ConexionController.conectar();
             PreparedStatement pstmt = conexion.prepareStatement(sql)){
@@ -44,9 +44,8 @@ public class UserRegistration {
                 pstmt.setString(3, usuarioActualizado.getTelefono());
                 pstmt.setString(4, usuarioActualizado.getCorreoElectronico());
                 pstmt.setString(5, usuarioActualizado.getContraseña());
-                pstmt.setString(7, usuarioActualizado.getPreguntaSeguridad());
-
                 pstmt.setString(6, usuarioActualizado.getUsuario());
+                pstmt.setString(7, usuarioActualizado.getPreguntaSeguridad());
 
                 int filasAfectadas = pstmt.executeUpdate();
                 return filasAfectadas > 0;

@@ -34,7 +34,7 @@ public class User {
         }this.apellido = apellido;}
 
     public String getTelefono(){return telefono;}
-    public void setTelefono(String Telefono){this.telefono = telefono;}
+    public void setTelefono(String telefono){this.telefono = telefono;}
 
     public String getCorreoElectronico(){return correoElectronico;}
     public void setCorreoElectronico(String correoElectronico){
