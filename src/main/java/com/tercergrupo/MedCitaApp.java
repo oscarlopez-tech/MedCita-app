@@ -1,13 +1,11 @@
 package com.tercergrupo;
 
-import com.tercergrupo.controller.ConexionController;
+import com.tercergrupo.view.MedCitaFrame;
+
+import javax.swing.SwingUtilities;
 
 public class MedCitaApp {
     public static void main(String[] args) {
-        System.out.println("Iniciando MedCitaApp...");
-        
-        // Verificamos conexión inicial a Railway
-        ConexionController.conectar();
-        System.out.println("--------------------------------------------------\n");
+        SwingUtilities.invokeLater(() -> new MedCitaFrame().setVisible(true));
     }
 }

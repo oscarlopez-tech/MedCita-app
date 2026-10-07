@@ -8,7 +8,7 @@ import java.sql.SQLException;
 public class PasswordRecovery {
 
     public String obtenerPreguntaSeguridad(String correoElectronico) {
-        String sql = "SELECT pregunta_Seguridad FROM usuarios WHERE correo_electronico = ?";
+        String sql = "SELECT pregunta_Seguridad FROM usuarios WHERE correo = ?";
 
         try (Connection conexion = ConexionController.conectar();
              PreparedStatement pstmt = conexion.prepareStatement(sql)) {
@@ -27,8 +27,8 @@ public class PasswordRecovery {
     }
 
     public boolean validarYCambiarContraseña(String correoElectronico, String respuestaIngresada, String nuevaContraseña) {
-        String sqlSelect = "SELECT respuesta_Seguridad FROM usuarios WHERE correo_electronico = ? ";
-        String sqlUpdate = "UPDATE usuarios SET contraseña = ? WHERE correo_electronico = ?";
+        String sqlSelect = "SELECT respuesta_Seguridad FROM usuarios WHERE correo = ? ";
+        String sqlUpdate = "UPDATE usuarios SET contrasena = ? WHERE correo = ?";
 
         try (Connection conexion = ConexionController.conectar();
              PreparedStatement pstmtSelect = conexion.prepareStatement(sqlSelect)) {
