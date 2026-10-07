@@ -17,7 +17,7 @@ public class ConexionController {
             if (conexion != null && !conexion.isClosed()){
                 System.out.println("Conexion exitosa a la base de datos de Railway");
             }
-        } catch (SQLException e) {
+        } catch (ClassNotFoundException|SQLException e) {
             System.err.println("Error al conectar a la base de datos: " + e.getMessage());
         }
         return conexion;
