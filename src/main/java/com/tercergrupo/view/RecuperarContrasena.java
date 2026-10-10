@@ -5,36 +5,57 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
-import java.awt.GridLayout;
 
 // Ventana de recuperacion de contraseña
 public class RecuperarContrasena extends JPanel {
     private final JTextField correo = new JTextField();
-    private final JLabel pregunta = new JLabel("Primero busca tu pregunta de seguridad.");
+    private final JLabel pregunta = new JLabel("Primero elija su pregunta de seguridad.");
     private final JTextField respuesta = new JTextField();
     private final JPasswordField nuevaContrasena = new JPasswordField();
     private final JPasswordField confirmarContrasena = new JPasswordField();
-    private final JButton buscarPregunta = new JButton("Buscar pregunta");
-    private final JButton cambiarContrasena = new JButton("Cambiar contraseña");
-    private final JButton volver = new JButton("Volver");
+    private final JButton buscarPregunta = EstiloMedCita.boton("Buscar pregunta", false);
+    private final JButton cambiarContrasena = EstiloMedCita.boton("Cambiar contraseña", true);
+    private final JButton volver = EstiloMedCita.boton("Volver al inicio", false);
 
     public RecuperarContrasena() {
-        super(new GridLayout(0, 2, 8, 8));
-        add(new JLabel("MedCita - Recuperar contraseña"));
-        add(new JLabel(""));
-        add(new JLabel("Correo electrónico:"));
-        add(correo);
-        add(buscarPregunta);
-        add(pregunta);
-        add(new JLabel("Respuesta:"));
-        add(respuesta);
-        add(new JLabel("Nueva contraseña:"));
-        add(nuevaContrasena);
-        add(new JLabel("Confirmar contraseña:"));
-        add(confirmarContrasena);
+        JPanel tarjeta = EstiloMedCita.formulario(
+            this, 
+            "Recuperar contraseña",
+            "Verifica tu cuenta con la pregunta de seguridad.");
+
+        EstiloMedCita.campo(
+            tarjeta, 
+            "Correo electrónico", 
+            correo);
+
+        EstiloMedCita.acciones(
+            tarjeta, 
+            buscarPregunta);
+
+        EstiloMedCita.aviso(
+            tarjeta, 
+            pregunta);
+
+        EstiloMedCita.campo(
+            tarjeta, 
+            "Respuesta", 
+            respuesta);
+
+        EstiloMedCita.campo(
+            tarjeta, 
+            "Nueva contraseña (mínimo 8 caracteres)", 
+            nuevaContrasena);
+
+        EstiloMedCita.campo(
+            tarjeta, "Confirmar contraseña", 
+            confirmarContrasena);
         cambiarContrasena.setEnabled(false);
-        add(cambiarContrasena);
-        add(volver);
+
+        EstiloMedCita.acciones(
+            tarjeta, 
+            cambiarContrasena, 
+            volver);
+
     }
 
     // Datos y botones
@@ -79,7 +100,7 @@ public class RecuperarContrasena extends JPanel {
         respuesta.setText("");
         nuevaContrasena.setText("");
         confirmarContrasena.setText("");
-        pregunta.setText("Primero busca tu pregunta de seguridad.");
+        pregunta.setText("Primero busque su pregunta de seguridad.");
         cambiarContrasena.setEnabled(false);
     }
 }

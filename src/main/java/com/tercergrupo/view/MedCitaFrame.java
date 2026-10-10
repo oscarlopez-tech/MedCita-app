@@ -7,12 +7,12 @@ import com.tercergrupo.model.User;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.SwingWorker;
 import java.awt.CardLayout;
-import java.awt.GridLayout;
+import java.awt.Dimension;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 
@@ -36,15 +36,21 @@ public class MedCitaFrame extends JFrame {
     // Configura la ventana y conecta los botones de navegacion
     public MedCitaFrame() {
         super("MedCita");
+        EstiloMedCita.configurarDialogos();
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(500, 420);
-        setLocationRelativeTo(null);
+        setMinimumSize(new Dimension(500, 500));
 
         screens.add(loginView, LOGIN);
         screens.add(registerView, REGISTER);
         screens.add(recoveryView, RECOVERY);
         screens.add(buildHomeView(), HOME);
-        add(screens);
+        JScrollPane contenido = new JScrollPane(screens);
+        contenido.setBorder(null);
+        contenido.getVerticalScrollBar().setUnitIncrement(16);
+        contenido.setPreferredSize(new Dimension(560, 740));
+        add(contenido);
+        pack();
+        setLocationRelativeTo(null);
 
         loginView.getIniciarSesion().addActionListener(event ->
                 iniciarSesion(loginView.getIniciarSesion()));
@@ -65,18 +71,22 @@ public class MedCitaFrame extends JFrame {
 
     // Ventana que se muestra despues de iniciar sesion
     private JPanel buildHomeView() {
-        JPanel panel = new JPanel(new GridLayout(0, 2, 8, 8));
-        panel.add(new JLabel("MedCita"));
-        panel.add(new JLabel(""));
-        panel.add(new JLabel("Sesión iniciada correctamente."));
-        panel.add(new JLabel(""));
-        JButton cerrarSesion = new JButton("Cerrar sesión");
+        JPanel panel = new JPanel();
+
+        JPanel tarjeta = EstiloMedCita.formulario(
+            panel, 
+            "Bienvenido a MedCita",
+            "Sesión iniciada correctamente.");
+
+        JButton cerrarSesion = EstiloMedCita.boton(
+            "Cerrar sesión", 
+            false);
         cerrarSesion.addActionListener(event -> {
             loginView.limpiar();
             mostrarPantalla(LOGIN);
         });
-        panel.add(cerrarSesion);
-        panel.add(new JLabel(""));
+
+        EstiloMedCita.acciones(tarjeta, cerrarSesion);
         return panel;
     }
 
@@ -107,7 +117,7 @@ public class MedCitaFrame extends JFrame {
         String contrasena = new String(registerView.getContrasena());
         if (nombre.isEmpty() || correo.isEmpty() || registerView.getTelefono().isEmpty()
                 || registerView.getRespuesta().isEmpty()) {
-            mostrarError("Completa todos los campos.");
+            mostrarError("Debe completar todos los campos.");
             return;
         }
         if (contrasena.length() < 8) {
@@ -134,7 +144,8 @@ public class MedCitaFrame extends JFrame {
                     if (registrado) {
                         registerView.limpiar();
                         mostrarPantalla(LOGIN);
-                        JOptionPane.showMessageDialog(this, "La cuenta se creó correctamente.");
+                        JOptionPane.showMessageDialog(this, "La cuenta se creó correctamente.",
+                                "MedCita", JOptionPane.INFORMATION_MESSAGE);
                     } else {
                         mostrarError("No se pudo crear la cuenta. Verifica los datos e intenta de nuevo.");
                     }
@@ -188,7 +199,8 @@ public class MedCitaFrame extends JFrame {
                     if (cambiada) {
                         recoveryView.limpiar();
                         mostrarPantalla(LOGIN);
-                        JOptionPane.showMessageDialog(this, "La contraseña se actualizó.");
+                        JOptionPane.showMessageDialog(this, "La contraseña se actualizó.",
+                                "MedCita", JOptionPane.INFORMATION_MESSAGE);
                     } else {
                         mostrarError("La respuesta no coincide o no se pudo cambiar la contraseña.");
                     }
