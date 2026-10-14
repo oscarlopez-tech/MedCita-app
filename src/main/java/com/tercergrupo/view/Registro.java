@@ -2,11 +2,9 @@ package com.tercergrupo.view;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
-import java.awt.GridLayout;
 
 // Formulario de registro 
 public class Registro extends JPanel {
@@ -19,28 +17,56 @@ public class Registro extends JPanel {
             "¿En qué ciudad naciste?",
             "¿Cuál era el nombre de tu escuela?"
     });
+
     private final JTextField respuesta = new JTextField();
-    private final JButton registrar = new JButton("Registrar");
-    private final JButton volver = new JButton("Volver");
+    
+    private final JButton registrar = EstiloMedCita.boton(
+        "Crear cuenta", 
+        true);
+
+    private final JButton volver = EstiloMedCita.boton(
+        "Volver al inicio", 
+        false);
 
     public Registro() {
-        super(new GridLayout(0, 2, 8, 8));
-        add(new JLabel("MedCita - Crear cuenta"));
-        add(new JLabel(""));
-        add(new JLabel("Nombre completo:"));
-        add(nombreCompleto);
-        add(new JLabel("Teléfono:"));
-        add(telefono);
-        add(new JLabel("Correo electrónico:"));
-        add(correo);
-        add(new JLabel("Contraseña:"));
-        add(contrasena);
-        add(new JLabel("Pregunta de seguridad:"));
-        add(pregunta);
-        add(new JLabel("Respuesta:"));
-        add(respuesta);
-        add(registrar);
-        add(volver);
+        JPanel tarjeta = EstiloMedCita.formulario(
+            this, "Crear cuenta",
+            "Completa tus datos para registrarte en MedCita.");
+
+        EstiloMedCita.campo(
+            tarjeta, 
+            "Nombre completo", 
+            nombreCompleto);
+
+        EstiloMedCita.campo(
+            tarjeta, 
+            "Teléfono", 
+            telefono);
+
+        EstiloMedCita.campo(
+            tarjeta, 
+            "Correo electrónico", 
+            correo);
+
+        EstiloMedCita.campo(
+            tarjeta, 
+            "Contraseña (mínimo 8 caracteres)", 
+            contrasena);
+
+        EstiloMedCita.campo(
+            tarjeta, 
+            "Pregunta de seguridad", 
+            pregunta);
+
+        EstiloMedCita.campo(
+            tarjeta, 
+            "Respuesta", 
+            respuesta);
+
+        EstiloMedCita.acciones(
+            tarjeta, 
+            registrar, 
+            volver);
     }
 
     // Datos y botones

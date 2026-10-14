@@ -1,32 +1,44 @@
 package com.tercergrupo.view;
 
 import javax.swing.JButton;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
-import java.awt.GridLayout;
 
 // Ventana de inicio de sesion
 public class InicioSesion extends JPanel {
     private final JTextField correo = new JTextField();
+
     private final JPasswordField contrasena = new JPasswordField();
-    private final JButton iniciarSesion = new JButton("Iniciar sesión");
-    private final JButton registrar = new JButton("Crear cuenta");
-    private final JButton recuperar = new JButton("Olvidé mi contraseña");
+
+    private final JButton iniciarSesion = EstiloMedCita.boton(
+        "Iniciar sesión", 
+        true);
+    private final JButton registrar = EstiloMedCita.boton(
+        "Registrarse", 
+        false);
+    private final JButton recuperar = EstiloMedCita.boton(
+        "Olvidé mi contraseña", 
+        false);
 
     public InicioSesion() {
-        super(new GridLayout(0, 2, 8, 8));
-        add(new JLabel("MedCita - Iniciar sesión"));
-        add(new JLabel(""));
-        add(new JLabel("Correo electrónico:"));
-        add(correo);
-        add(new JLabel("Contraseña:"));
-        add(contrasena);
-        add(iniciarSesion);
-        add(registrar);
-        add(recuperar);
-        add(new JLabel(""));
+        JPanel tarjeta = EstiloMedCita.formulario(
+            this, 
+            "Iniciar sesión",
+            "Bienvenido. Ingresa los datos de tu cuenta.");
+        EstiloMedCita.campo(
+            tarjeta, 
+            "Correo electrónico", 
+            correo);
+        EstiloMedCita.campo(
+            tarjeta, 
+            "Contraseña", 
+            contrasena);
+        EstiloMedCita.acciones(
+            tarjeta, 
+            iniciarSesion, 
+            registrar, 
+            recuperar);
     }
 
     // Datos y botones
