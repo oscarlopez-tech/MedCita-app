@@ -6,12 +6,14 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import com.tercergrupo.model.User;
+import com.tercergrupo.model.RolUsuario;
 
 public class LoginController {
 
     public User autenticarUsuario(String usuarioIngresado, String contraseñaIngresada) {
-        String sql = "SELECT nombre_completo, telefono, correo, pregunta_Seguridad "
-                + "FROM usuarios WHERE correo = ? AND contrasena = ?";
+        String sql = "SELECT u.nombre_completo, u.telefono, u.correo, u.pregunta_Seguridad, "
+                + "r.nombre_rol FROM usuarios u JOIN roles r ON u.id_rol = r.id_rol "
+                + "WHERE u.correo = ? AND u.contrasena = ?";
         
         try (Connection conexion = ConexionController.conectar();
              PreparedStatement pstmt = conexion.prepareStatement(sql)) {
@@ -26,6 +28,7 @@ public class LoginController {
                     usuarioValido.setTelefono(rs.getString("telefono"));
                     usuarioValido.setCorreoElectronico(rs.getString("correo"));
                     usuarioValido.setUsuario(rs.getString("correo"));
+                    usuarioValido.setRol(RolUsuario.desdeNombre(rs.getString("nombre_rol")));
                     String preguntaSeguridad = rs.getString("pregunta_Seguridad");
                     if (preguntaSeguridad != null) {
                         usuarioValido.setPreguntaSeguridad(preguntaSeguridad);

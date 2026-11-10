@@ -9,6 +9,7 @@ public class User {
     private String contraseña;
     private String preguntaSeguridad;
     private String respuestaSeguridad;
+    private RolUsuario rol = RolUsuario.SIN_ACCESO;
 
     public User() {
     }
@@ -106,5 +107,13 @@ public class User {
             throw new IllegalArgumentException("La respuesta de seguridad es obligatoria");
         }
         this.respuestaSeguridad = respuestaSeguridad;
+    }
+
+    public RolUsuario getRol() {
+        return rol;
+    }
+
+    public void setRol(RolUsuario rol) {
+        this.rol = rol == null ? RolUsuario.SIN_ACCESO : rol;
     }
 }
