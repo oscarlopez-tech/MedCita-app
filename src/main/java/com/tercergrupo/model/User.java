@@ -10,8 +10,17 @@ public class User {
     private String preguntaSeguridad;
     private String respuestaSeguridad;
     private RolUsuario rol = RolUsuario.SIN_ACCESO;
+    private boolean activo = true;
 
     public User() {
+    }
+
+    public boolean isActivo(){
+        return activo; 
+    }
+
+    public void setActivo(boolean activo){
+        this.activo = activo; 
     }
 
     public User(String nombre, String apellido, String telefono, String correoElectronico, String usuario,

@@ -71,7 +71,7 @@ public class CitasControllerTest {
 
     @Test
     public void rolesDesconocidosNoObtienenPermisos() {
-        assertEquals(RolUsuario.SIN_ACCESO, RolUsuario.desdeNombre("Recepcionista"));
+        assertEquals(RolUsuario.SIN_ACCESO, RolUsuario.desdeNombre("Desconocido"));
         assertEquals(RolUsuario.FACTURACION, RolUsuario.desdeNombre("Facturación/CxC"));
     }
 

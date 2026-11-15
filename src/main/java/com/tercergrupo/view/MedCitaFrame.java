@@ -1,9 +1,9 @@
 package com.tercergrupo.view;
 
-import com.tercergrupo.controller.LoginController;
-import com.tercergrupo.controller.PasswordRecovery;
-import com.tercergrupo.controller.UserRegistration;
-import com.tercergrupo.model.User;
+import java.awt.CardLayout;
+import java.awt.Dimension;
+import java.util.concurrent.ExecutionException;
+import java.util.function.Consumer;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -11,10 +11,15 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SwingWorker;
-import java.awt.CardLayout;
-import java.awt.Dimension;
-import java.util.concurrent.ExecutionException;
-import java.util.function.Consumer;
+
+import com.tercergrupo.controller.ControlAcceso;
+import com.tercergrupo.controller.LoginController;
+import com.tercergrupo.controller.PasswordRecovery;
+import com.tercergrupo.controller.UserRegistration;
+import com.tercergrupo.model.Permiso;
+import com.tercergrupo.model.RolUsuario;
+import com.tercergrupo.model.User;
+import com.tercergrupo.model.UserSession;
 
 // Ventana principal
 public class MedCitaFrame extends JFrame {
@@ -22,16 +27,33 @@ public class MedCitaFrame extends JFrame {
     private static final String REGISTER = "register";
     private static final String RECOVERY = "recovery";
     private static final String HOME = "home";
+    private static final String CITAS = "citas";
 
     private final CardLayout cardLayout = new CardLayout();
     private final JPanel screens = new JPanel(cardLayout);
     private final InicioSesion loginView = new InicioSesion();
     private final Registro registerView = new Registro();
     private final RecuperarContrasena recoveryView = new RecuperarContrasena();
+    private final CitasPanel citasView = new CitasPanel();
 
     private final LoginController loginController = new LoginController();
     private final UserRegistration userRegistration = new UserRegistration();
     private final PasswordRecovery passwordRecovery = new PasswordRecovery();
+
+    private final JButton botonCitas = EstiloMedCita.boton("Citas", false); 
+    private final JButton botonFacturacion = EstiloMedCita.boton("Facturacion", false); 
+    private final JButton botonConfiguracion = EstiloMedCita.boton("Configuracion", false); 
+
+
+
+    //Configura botones por Rol
+    private void configurarBotonesPorRol(RolUsuario  rol){
+        botonCitas.setVisible(ControlAcceso.puede(rol, Permiso.VER_CITAS));
+        botonFacturacion.setVisible(ControlAcceso.puede(rol,Permiso.VER_FACTURAS));
+        botonConfiguracion.setVisible(ControlAcceso.puede(rol, Permiso.GESTIONAR_USUARIOS));
+        citasView.configurarPermisos(rol);
+
+    }
 
     // Configura la ventana y conecta los botones de navegacion
     public MedCitaFrame() {
@@ -44,6 +66,7 @@ public class MedCitaFrame extends JFrame {
         screens.add(registerView, REGISTER);
         screens.add(recoveryView, RECOVERY);
         screens.add(buildHomeView(), HOME);
+        screens.add(citasView, CITAS);
         JScrollPane contenido = new JScrollPane(screens);
         contenido.setBorder(null);
         contenido.getVerticalScrollBar().setUnitIncrement(16);
@@ -67,26 +90,34 @@ public class MedCitaFrame extends JFrame {
         recoveryView.getBotonCambiarContrasena().addActionListener(event ->
                 cambiarContrasena(recoveryView.getBotonCambiarContrasena()));
         recoveryView.getBotonVolver().addActionListener(event -> mostrarPantalla(LOGIN));
+        botonConfiguracion.addActionListener(event -> new Configuracion(this).setVisible(true));
+        botonCitas.addActionListener(event -> {
+            citasView.cargarCitas();
+            mostrarPantalla(CITAS);
+        });
+        citasView.getBotonVolver().addActionListener(event -> mostrarPantalla(HOME));
     }
 
     // Ventana que se muestra despues de iniciar sesion
     private JPanel buildHomeView() {
         JPanel panel = new JPanel();
-
         JPanel tarjeta = EstiloMedCita.formulario(
             panel, 
             "Bienvenido a MedCita",
-            "Sesión iniciada correctamente.");
+            "");
 
         JButton cerrarSesion = EstiloMedCita.boton(
             "Cerrar sesión", 
             false);
+
         cerrarSesion.addActionListener(event -> {
+            UserSession.getInstance().cleanSession();
             loginView.limpiar();
             mostrarPantalla(LOGIN);
         });
 
-        EstiloMedCita.acciones(tarjeta, cerrarSesion);
+        EstiloMedCita.acciones(tarjeta, botonCitas, botonFacturacion, botonConfiguracion, cerrarSesion);
+        EstiloMedCita.nota(tarjeta, "Sesión iniciada correctamente.");
         return panel;
     }
 
@@ -105,6 +136,8 @@ public class MedCitaFrame extends JFrame {
                     if (usuario == null) {
                         mostrarError("No fue posible iniciar sesión. Verifica tus datos.");
                     } else {
+                        UserSession.getInstance().setLoggedInUser(usuario);
+                        configurarBotonesPorRol(usuario.getRol()); 
                         mostrarPantalla(HOME);
                     }
                 });

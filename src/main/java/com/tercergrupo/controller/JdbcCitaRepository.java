@@ -1,14 +1,15 @@
 package com.tercergrupo.controller;
 
+import com.tercergrupo.config.ConexionBaseDatos;
 import com.tercergrupo.model.Cita;
 
 import java.sql.Connection;
-import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.sql.Time;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -17,7 +18,7 @@ public class JdbcCitaRepository implements CitaRepository {
     @Override
     public long crear(Cita cita) throws SQLException {
         String sql = "INSERT INTO citas (paciente, doctor_correo, fecha, hora) VALUES (?, ?, ?, ?)";
-        try (Connection conexion = obtenerConexion();
+        try (Connection conexion = ConexionBaseDatos.abrir();
              PreparedStatement sentencia = conexion.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             asignarDatos(sentencia, cita);
             sentencia.executeUpdate();
@@ -33,7 +34,7 @@ public class JdbcCitaRepository implements CitaRepository {
     @Override
     public void actualizar(Cita cita) throws SQLException {
         String sql = "UPDATE citas SET paciente = ?, doctor_correo = ?, fecha = ?, hora = ? WHERE id_cita = ?";
-        try (Connection conexion = obtenerConexion();
+        try (Connection conexion = ConexionBaseDatos.abrir();
              PreparedStatement sentencia = conexion.prepareStatement(sql)) {
             asignarDatos(sentencia, cita);
             sentencia.setLong(5, cita.id());
@@ -46,7 +47,7 @@ public class JdbcCitaRepository implements CitaRepository {
     @Override
     public Optional<Cita> buscarPorId(long id) throws SQLException {
         String sql = "SELECT id_cita, paciente, doctor_correo, fecha, hora FROM citas WHERE id_cita = ?";
-        try (Connection conexion = obtenerConexion();
+        try (Connection conexion = ConexionBaseDatos.abrir();
              PreparedStatement sentencia = conexion.prepareStatement(sql)) {
             sentencia.setLong(1, id);
             try (ResultSet resultados = sentencia.executeQuery()) {
@@ -71,11 +72,11 @@ public class JdbcCitaRepository implements CitaRepository {
     public boolean horarioOcupado(String doctorCorreo, Cita cita, long excluirId) throws SQLException {
         String sql = "SELECT 1 FROM citas WHERE doctor_correo = ? AND fecha = ? AND hora = ? "
                 + "AND id_cita <> ? LIMIT 1";
-        try (Connection conexion = obtenerConexion();
+        try (Connection conexion = ConexionBaseDatos.abrir();
              PreparedStatement sentencia = conexion.prepareStatement(sql)) {
             sentencia.setString(1, doctorCorreo);
-            sentencia.setDate(2, Date.valueOf(cita.fecha()));
-            sentencia.setTime(3, Time.valueOf(cita.hora()));
+            sentencia.setString(2, cita.fecha().toString());
+            sentencia.setString(3, cita.hora().toString());
             sentencia.setLong(4, excluirId);
             try (ResultSet resultados = sentencia.executeQuery()) {
                 return resultados.next();
@@ -85,7 +86,7 @@ public class JdbcCitaRepository implements CitaRepository {
 
     private List<Cita> listar(String sql, String doctorCorreo) throws SQLException {
         List<Cita> citas = new ArrayList<>();
-        try (Connection conexion = obtenerConexion();
+        try (Connection conexion = ConexionBaseDatos.abrir();
              PreparedStatement sentencia = conexion.prepareStatement(sql)) {
             if (doctorCorreo != null) {
                 sentencia.setString(1, doctorCorreo);
@@ -104,22 +105,14 @@ public class JdbcCitaRepository implements CitaRepository {
                 resultado.getLong("id_cita"),
                 resultado.getString("paciente"),
                 resultado.getString("doctor_correo"),
-                resultado.getDate("fecha").toLocalDate(),
-                resultado.getTime("hora").toLocalTime());
+                LocalDate.parse(resultado.getString("fecha")),
+                LocalTime.parse(resultado.getString("hora")));
     }
 
     private void asignarDatos(PreparedStatement sentencia, Cita cita) throws SQLException {
         sentencia.setString(1, cita.paciente());
         sentencia.setString(2, cita.doctorCorreo());
-        sentencia.setDate(3, Date.valueOf(cita.fecha()));
-        sentencia.setTime(4, Time.valueOf(cita.hora()));
-    }
-
-    private Connection obtenerConexion() throws SQLException {
-        Connection conexion = ConexionController.conectar();
-        if (conexion == null) {
-            throw new SQLException("No se pudo establecer conexión con la base de datos.");
-        }
-        return conexion;
+        sentencia.setString(3, cita.fecha().toString());
+        sentencia.setString(4, cita.hora().toString());
     }
 }

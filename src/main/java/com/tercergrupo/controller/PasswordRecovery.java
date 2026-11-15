@@ -5,12 +5,14 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import com.tercergrupo.config.ConexionBaseDatos;
+
 public class PasswordRecovery {
 
     public String obtenerPreguntaSeguridad(String correoElectronico) {
         String sql = "SELECT pregunta_Seguridad FROM usuarios WHERE correo = ?";
 
-        try (Connection conexion = ConexionController.conectar();
+        try (Connection conexion = ConexionBaseDatos.abrir();
              PreparedStatement pstmt = conexion.prepareStatement(sql)) {
             pstmt.setString(1, correoElectronico);
             
@@ -30,7 +32,7 @@ public class PasswordRecovery {
         String sqlSelect = "SELECT respuesta_Seguridad FROM usuarios WHERE correo = ? ";
         String sqlUpdate = "UPDATE usuarios SET contrasena = ? WHERE correo = ?";
 
-        try (Connection conexion = ConexionController.conectar();
+        try (Connection conexion = ConexionBaseDatos.abrir();
              PreparedStatement pstmtSelect = conexion.prepareStatement(sqlSelect)) {
             
             pstmtSelect.setString(1, correoElectronico);
