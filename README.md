@@ -1,6 +1,15 @@
 # MedCita-app
 
-Este proyecto es un sistema de gestión para clínica médica. Actualmente incluye una interfaz de escritorio en Java Swing para inicio de sesión, registro de usuarios y recuperación de contraseña.
+Este proyecto es un sistema de gestión para clínica médica, desarrollado como aplicación de escritorio en Java Swing con base de datos SQLite.
+
+Actualmente la aplicación permite:
+
+- Iniciar sesión, registrar cuentas y recuperar la contraseña mediante la pregunta de seguridad.
+- Gestionar cuatro roles (administrador, doctor, facturación y sin acceso), con permisos que controlan qué botones y acciones están disponibles.
+- Agendar, consultar y modificar citas médicas, evitando horarios duplicados para un mismo doctor.
+- Administrar usuarios desde la ventana Configuración: asignar roles, bloquear, desbloquear y eliminar cuentas.
+
+Pendiente: el módulo de Facturación y Cuentas por Cobrar.
 
 ## Ejecución
 
