@@ -9,7 +9,7 @@ Actualmente la aplicación permite:
 - Agendar, consultar y modificar citas médicas, evitando horarios duplicados para un mismo doctor.
 - Administrar usuarios desde la ventana Configuración: asignar roles, bloquear, desbloquear y eliminar cuentas.
 
-Pendiente: el módulo de Facturación y Cuentas por Cobrar.
+- Confirmar citas atendidas, generar sus facturas y registrar pagos completos o parciales en Cuentas por Cobrar.
 
 ## Ejecución
 
@@ -49,7 +49,7 @@ El administrador se siembra desde `InicializadorBaseDatos` en cada arranque, as�
 
 ## Resumen de cambios realizados
 
-- **Base de datos:** migración de Railway/MySQL a SQLite (`jdbc:sqlite:data/medcita.db`) con `PRAGMA foreign_keys = ON`. Las tablas `usuarios` y `citas` se crean en `InicializadorBaseDatos`. Se eliminaron `ConexionController` y `citas.sql`. La carpeta `data/` está en `.gitignore`.
+- **Base de datos:** migración de Railway/MySQL a SQLite (`jdbc:sqlite:data/medcita.db`) con `PRAGMA foreign_keys = ON`. Las tablas `usuarios`, `citas`, `citas_atendidas` y `facturas` se crean en `InicializadorBaseDatos`. Se eliminaron `ConexionController` y `citas.sql`. La carpeta `data/` está en `.gitignore`.
 - **Roles y permisos:** enum `Permiso` (VER_CITAS, CREAR_CITA, MODIFICAR_CITA, VER_FACTURAS, CREAR_FACTURA, GESTIONAR_USUARIOS) y `ControlAcceso.puede(rol, permiso)`. La ventana principal muestra solo los botones permitidos por rol.
 - **Sesión:** `UserSession` guarda el usuario que inició sesión. Se limpia al cerrar sesión.
 - **Gestión de usuarios:** ventana Configuración con la pestaña Gestión de Usuarios, para listar, filtrar solicitudes, asignar rol, bloquear, desbloquear y eliminar usuarios.
@@ -91,11 +91,23 @@ El administrador se siembra desde `InicializadorBaseDatos` en cada arranque, as�
 - La tabla `citas` se crea automáticamente en `InicializadorBaseDatos`; no hay que ejecutar scripts manualmente.
 - Se agregaron pruebas automatizadas para permisos, creación, modificación y horarios duplicados.
 
-### Estudiante 3: Facturación y Cuentas por Cobrar — pendiente
+### Estudiante 3: Facturación y Cuentas por Cobrar — completado
 
-- Falta definir e implementar el flujo para generar una factura a partir de una cita atendida.
-- Falta definir e implementar los estados de Cuentas por Cobrar, como pendiente y pagado.
-- Según el alcance acordado, el doctor no debe tener acceso a este módulo.
+- Acceso exclusivo para ADMINISTRADOR y FACTURACION. El Doctor no ve el botón y el controlador rechaza todas sus operaciones de facturación y cobro.
+- Desde Inicio → Facturación se muestran dos pestañas: Citas sin facturar y Cuentas por cobrar.
+- Flujo: seleccionar una cita → Confirmar atención → Generar factura → ingresar concepto y total → registrar los pagos en Cuentas por cobrar.
+- La confirmación de atención es manual, a cargo del administrador o de Facturación. No se confirma automáticamente por haber pasado la fecha. No se permite confirmar una cita futura.
+- Una cita atendida ya no puede editarse. Las citas existentes siguen disponibles y comienzan sin confirmación de atención.
+- Una cita solo puede generar una factura y debe tener su atención confirmada. Al facturar, deja de aparecer en Citas sin facturar.
+- Cada factura nace con estado PENDIENTE, importe pagado cero y saldo igual al total. Un abono reduce el saldo; mientras quede deuda continúa PENDIENTE. Al completar el total pasa a PAGADO.
+- Se rechazan importes no positivos, más de dos decimales y pagos mayores al saldo. Los importes se expresan en colones (CRC), sin separadores de miles.
+- La tabla permite filtrar Todas, Pendientes y Pagadas. El resumen muestra el saldo pendiente de todas las cuentas, independientemente del filtro.
+- Los montos se guardan como enteros en centavos. El estado se calcula según el saldo, por lo que no se guarda un estado independiente que pueda quedar desactualizado.
+- Las facturas conservan paciente, doctor, fecha de atención, fecha de emisión y concepto. Permanecen aunque después se eliminen la cuenta del doctor y sus citas.
+- Se reutilizan `EstiloMedCita`, `UserSession`, `ControlAcceso`, `CardLayout`, tablas Swing y consultas JDBC. No se agregaron dependencias.
+- Clases nuevas: `Factura`, `EstadoCuenta`, `FacturacionController`, `FacturacionPanel` y `FormularioFactura`.
+- Alcance: registro interno de facturas y saldo acumulado por factura. No incluye comprobantes electrónicos fiscales, impuestos, anulaciones ni historial individual de abonos.
+- Pruebas: `FacturacionControllerTest` utiliza SQLite temporal y no modifica la base de datos de la aplicación.
 
 ### Estudiante 4: Gestión de Usuarios — completado
 
@@ -111,15 +123,15 @@ El administrador se siembra desde `InicializadorBaseDatos` en cada arranque, as�
 
 ## Pruebas automatizadas
 
-Ejecuta `mvn test`. Actualmente hay 16 pruebas que pasan:
+Ejecuta `mvn test`. Actualmente hay 26 pruebas que pasan:
 
 - `CitasControllerTest`: 6 pruebas de permisos, creación, modificación y horarios duplicados de citas.
 - `ControlAccesoTest`: 5 pruebas de permisos por rol.
 - `UsuariosControllerTest`: 4 pruebas de reglas de acceso y de protección del propio usuario.
+- `FacturacionControllerTest`: 10 pruebas del flujo de atención y facturación, duplicados, pagos parciales y completos, validaciones, permisos y conservación de facturas.
 - `AppTest`: 1 prueba básica.
 
 ## Pendientes
 
-- Módulo de Facturación y Cuentas por Cobrar (Estudiante 3).
 - Cifrar las contraseñas; actualmente se guardan en texto plano.
 - Retirar el usuario de prueba antes de la entrega final.

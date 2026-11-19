@@ -28,6 +28,7 @@ public class MedCitaFrame extends JFrame {
     private static final String RECOVERY = "recovery";
     private static final String HOME = "home";
     private static final String CITAS = "citas";
+    private static final String FACTURACION = "facturacion";
 
     private final CardLayout cardLayout = new CardLayout();
     private final JPanel screens = new JPanel(cardLayout);
@@ -35,13 +36,14 @@ public class MedCitaFrame extends JFrame {
     private final Registro registerView = new Registro();
     private final RecuperarContrasena recoveryView = new RecuperarContrasena();
     private final CitasPanel citasView = new CitasPanel();
+    private final FacturacionPanel facturacionView = new FacturacionPanel();
 
     private final LoginController loginController = new LoginController();
     private final UserRegistration userRegistration = new UserRegistration();
     private final PasswordRecovery passwordRecovery = new PasswordRecovery();
 
     private final JButton botonCitas = EstiloMedCita.boton("Citas", false); 
-    private final JButton botonFacturacion = EstiloMedCita.boton("Facturacion", false); 
+    private final JButton botonFacturacion = EstiloMedCita.boton("Facturación", false);
     private final JButton botonConfiguracion = EstiloMedCita.boton("Configuracion", false); 
 
 
@@ -67,6 +69,7 @@ public class MedCitaFrame extends JFrame {
         screens.add(recoveryView, RECOVERY);
         screens.add(buildHomeView(), HOME);
         screens.add(citasView, CITAS);
+        screens.add(facturacionView, FACTURACION);
         JScrollPane contenido = new JScrollPane(screens);
         contenido.setBorder(null);
         contenido.getVerticalScrollBar().setUnitIncrement(16);
@@ -96,6 +99,11 @@ public class MedCitaFrame extends JFrame {
             mostrarPantalla(CITAS);
         });
         citasView.getBotonVolver().addActionListener(event -> mostrarPantalla(HOME));
+        botonFacturacion.addActionListener(event -> {
+            facturacionView.cargarDatos();
+            mostrarPantalla(FACTURACION);
+        });
+        facturacionView.getBotonVolver().addActionListener(event -> mostrarPantalla(HOME));
     }
 
     // Ventana que se muestra despues de iniciar sesion

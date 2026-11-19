@@ -33,13 +33,14 @@ public class JdbcCitaRepository implements CitaRepository {
 
     @Override
     public void actualizar(Cita cita) throws SQLException {
-        String sql = "UPDATE citas SET paciente = ?, doctor_correo = ?, fecha = ?, hora = ? WHERE id_cita = ?";
+        String sql = "UPDATE citas SET paciente = ?, doctor_correo = ?, fecha = ?, hora = ? WHERE id_cita = ? "
+                + "AND NOT EXISTS (SELECT 1 FROM citas_atendidas WHERE cita_id = citas.id_cita)";
         try (Connection conexion = ConexionBaseDatos.abrir();
              PreparedStatement sentencia = conexion.prepareStatement(sql)) {
             asignarDatos(sentencia, cita);
             sentencia.setLong(5, cita.id());
             if (sentencia.executeUpdate() != 1) {
-                throw new SQLException("No se encontró la cita que se intenta actualizar.");
+                throw new SQLException("La cita no existe o ya fue atendida y no puede modificarse.");
             }
         }
     }
